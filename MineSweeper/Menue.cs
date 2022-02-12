@@ -10,6 +10,7 @@ namespace MineSweeper
     {
         public static void MainMenue()
         {
+            //CursorGesteuertesMenue
             do
             {
                 Console.WriteLine(

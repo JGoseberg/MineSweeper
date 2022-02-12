@@ -79,6 +79,7 @@ namespace MineSweeper
 
             int[,] gameField = new int[game.sizeHeight, game.sizeWidth];//Test
 
+
             //Minen setzen
             for (int i = 0; i < game.MinesCount; i++)
             {
@@ -112,17 +113,11 @@ namespace MineSweeper
                             for (int l = -1; l < 2; l++)
                             {
                                 if (i + k < 0 || j + l < 0 ||
-                                    i + k > gameField.GetLength(0) - 1 || i + k > gameField.GetLength(1) - 1 ||
-                                    i + k == i && j + l == j || gameField[i + k, j + l] == 10) ;
+                                    i + k >= gameField.GetLength(0) || j + l >= gameField.GetLength(1) ||
+                                    i + k == i && j + l == j) ;
+                                else if (gameField[i + k, j + l] == 10) ;
+                                else gameField[i + k, j + l]++; 
 
-                                
-                                
-                                else
-                                {
-                                    
-                                    gameField[i + k, j + l]++; //TODO 11?
-
-                                }
                             }
                         }
                     }
@@ -130,7 +125,8 @@ namespace MineSweeper
             }
 
             //Spielfeld malen
-            Console.Clear();
+            //Console.Clear();
+            Console.SetCursorPosition(0, 0);
             for (int i = 0; i < game.SizeWidth + 2; i++)
             {
                 Console.Write("-");
