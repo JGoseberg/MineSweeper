@@ -73,19 +73,18 @@ namespace MineSweeper
             }
             Console.WriteLine();
 
+            //CursorPosition
+            int cursorLeft = Console.CursorLeft;
+            int cursorHeight = Console.CursorTop;
 
-            //int cursorLeft = Console.CursorLeft;
-            //int cursorHeight = Console.CursorTop;
-                                           
             int[,] gameField = new int[game.sizeHeight, game.sizeWidth];//Test
 
             //Minen setzen
             for (int i = 0; i < game.MinesCount; i++)
             {
 
-                minesHeight[i] = rnd.Next(1, game.SizeHeight + 1);
-                minesWidth[i] = rnd.Next(1, game.sizeWidth + 1);
-
+                minesHeight[i] = rnd.Next(0, game.SizeHeight);
+                minesWidth[i] = rnd.Next(0, game.sizeWidth);
 
 
                 //Prüfung auf gleiche Positionen
@@ -96,9 +95,9 @@ namespace MineSweeper
                         i--;
                     }
                 }
-                Console.SetCursorPosition(minesHeight[i], minesWidth[i]);
+                Console.SetCursorPosition(minesHeight[i] + 1, minesWidth[i] + 1);
                 Console.Write("#");
-                gameField[minesHeight[i]-1, minesWidth[i]-1] = 10;
+                gameField[minesHeight[i], minesWidth[i]] = 10;
             }
 
             //HinweisErstellung //OutofBounds Argh
@@ -108,13 +107,22 @@ namespace MineSweeper
                 {
                     if (gameField[i, j] == 10)
                     {
-                        for (int k = -1; k < 2; k+=2)
+                        for (int k = -1; k < 2; k++)
                         {
-                            for (int l = -1; l < 2; l+=2)
+                            for (int l = -1; l < 2; l++)
                             {
-                                if (gameField[i -k,j-l] == 10 && gameField[i - k,j- l] < gameField.GetLength(0) && 
-                                    gameField[i -k,j- l] < gameField.GetLength(1) && i-k !< 0 && j-l !<0 && k != 0 && j != 0)
-                                gameField[i-k,j- l]++; //TODO 11?
+                                if (i + k < 0 || j + l < 0 ||
+                                    i + k > gameField.GetLength(0) - 1 || i + k > gameField.GetLength(1) - 1 ||
+                                    i + k == i && j + l == j || gameField[i + k, j + l] == 10) ;
+
+                                
+                                
+                                else
+                                {
+                                    
+                                    gameField[i + k, j + l]++; //TODO 11?
+
+                                }
                             }
                         }
                     }
@@ -135,15 +143,15 @@ namespace MineSweeper
                 Console.Write("|");
                 for (int j = 0; j < game.sizeWidth; j++)
                 {
-                    if (gameField[i,j] == 10)
-                    {
-                        Console.SetCursorPosition(i+1,j+1);
-                        Console.Write("#");
-                    }
-                    else if (gameField[i,j] >0 && gameField[i,j] <9 )
+                    if (gameField[i, j] == 10)
                     {
                         Console.SetCursorPosition(i + 1, j + 1);
-                        Console.Write(gameField[i,j]);
+                        Console.Write("#");
+                    }
+                    else if (gameField[i, j] > 0 && gameField[i, j] < 9)
+                    {
+                        Console.SetCursorPosition(i + 1, j + 1);
+                        Console.Write(gameField[i, j]);
                     }
                     else
                     {
@@ -153,7 +161,7 @@ namespace MineSweeper
                 }
                 Console.WriteLine("|");
             }
-            
+
             for (int i = 0; i < game.SizeWidth + 2; i++)
             {
                 Console.Write("-");
@@ -161,8 +169,7 @@ namespace MineSweeper
             Console.WriteLine();
 
 
-            int cursorLeft = Console.CursorLeft;
-            int cursorHeight = Console.CursorTop;
+
 
 
             Console.SetCursorPosition(cursorLeft, cursorHeight);
