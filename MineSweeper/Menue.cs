@@ -13,6 +13,7 @@ namespace MineSweeper
             //CursorGesteuertesMenue
             do
             {
+                Console.Clear();
                 Console.WriteLine(
                     "\tMineSweeper\n" +
                     "\'P\'-\tPlay\n" + //TODO
@@ -24,7 +25,8 @@ namespace MineSweeper
                 {
                     case ConsoleKey.P: //TODO
                         Game game = new();
-                        Game.BuildField(game);
+                        //Game.BuildField(game);
+                        Game.GameLoop(game);
                         break;
                     case ConsoleKey.H://TODO
                         break;

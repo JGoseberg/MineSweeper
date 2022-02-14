@@ -1,4 +1,6 @@
 ﻿//3D
+//Highscore
+//WPF
 
 using MineSweeper;
 
