@@ -1,7 +1,13 @@
-﻿//3D
+﻿//Settings
 //Highscore
+//Savegame
+//3D
 //WPF
 
 using MineSweeper;
 
-Menue.MainMenue();
+Game game = new();
+Game.GameLoop(game);
+
+//TODO menueUeberspringen
+//Menue.MainMenue();

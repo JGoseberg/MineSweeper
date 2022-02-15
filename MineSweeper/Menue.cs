@@ -24,9 +24,9 @@ namespace MineSweeper
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.P: //TODO
-                        Game game = new();
+                        //Game game = new();
                         //Game.BuildField(game);
-                        Game.GameLoop(game);
+                        //Game.GameLoop(game);
                         break;
                     case ConsoleKey.H://TODO
                         break;

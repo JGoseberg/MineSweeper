@@ -8,43 +8,40 @@ namespace MineSweeper
 {
     internal class Game
     {
-        int sizeHeight = 5;//TODO
-        int sizeWidth = 5;//TODO
-        int minesCount = 5;//TODO
+        int sizeHeight = 16;
+        int sizeWidth = 16;
+        int minesCount = 40;
+ 
+        int cursorHeight = 1;
+        int cursorLeft = 1;
 
-        string colorBackground = "black";//TODO
-        string colorText = "white";//TODO
-        string colorMines = "white";//TODO
-        string colorFlags = "red";//TODO
+        //Dictionary<int, string> colorHint = new Dictionary<int, string>()
+        //{
+        //    { 1, "blue" },
+        //    { 2, "green" },
+        //    { 3, "red" },
+        //    { 4, "darkblue" },
+        //    { 5, "brown" },
+        //    { 6, "turquoise" },
+        //    { 7, "white" },
+        //    { 8, "dark grey" }
+        //};
 
-        Dictionary<int, string> colorHint = new Dictionary<int, string>()
-        {
-            { 1, "blue" },//TODO
-            { 2, "green" },//TODO
-            { 3, "red" },//TODO
-            { 4, "darkblue" },//TODO
-            { 5, "brown" },//TODO
-            { 6, "turquoise" },//TODO
-            { 7, "white" },//TODO
-            { 8, "dark grey" }//TODO
-        };
 
         public int SizeHeight { get => sizeHeight; set => sizeHeight = value; }
         public int SizeWidth { get => sizeWidth; set => sizeWidth = value; }
-        public Dictionary<int, string> ColorHint { get => colorHint; set => colorHint = value; }
-        public string ColorText { get => colorText; set => colorText = value; }
-        public string ColorMines { get => colorMines; set => colorMines = value; }
-        public string ColorFlags { get => colorFlags; set => colorFlags = value; }
         public int MinesCount { get => minesCount; set => minesCount = value; }
-        public string ColorBackground { get => colorBackground; set => colorBackground = value; }
+        public int CursorHeight { get => cursorHeight; set => cursorHeight = value; }
+        public int CursorLeft { get => cursorLeft; set => cursorLeft = value; }
 
 
         public static void GameLoop(Game game)
         {
-            Game.BuildField(game);
+            Game.Init(game);
         }
 
-        public static void BuildField(Game game)
+
+        public static void Init(Game game)
         {
             int[] minesHeight = new int[game.MinesCount];
             int[] minesWidth = new int[game.MinesCount];
@@ -55,13 +52,12 @@ namespace MineSweeper
             //Console.WindowHeight = game.SizeHeight+3;
             //Console.WindowWidth = game.SizeWidth+2;
 
-
             Console.Clear();
 
-            //int cursorLeft = 0;//Console.CursorLeft;
-            //int cursorHeight = 0;//Console.CursorTop;
-
-            int[,] gameField = new int[game.sizeHeight, game.sizeWidth];//Test
+            //0     = void
+            //1-9   = Hinweis
+            //10    = Bombe
+            int[,] gameField = new int[game.sizeHeight, game.sizeWidth];
 
 
             //Minen setzen
@@ -103,14 +99,51 @@ namespace MineSweeper
                     }
                 }
             }
-            DrawBaseField(game, gameField);
-            Navigation(game, gameField);
+            bool[,] isActivated = new bool[gameField.GetLength(0), gameField.GetLength(1)];
+            bool[,] bombDetected = new bool[gameField.GetLength(0), gameField.GetLength(1)];
+            for (int i = 0; i < isActivated.GetLength(0); i++)
+            {
+                for (int j = 0; j < isActivated.GetLength(1); j++)
+                {
+                    isActivated[i, j] = false;
+                    bombDetected[i, j] = false;
+                }
+            }
+            DrawBaseField(game, gameField, isActivated, bombDetected);
         }
 
 
-        public static void DrawBaseField(Game game, int[,] gameField)
+        public static void CheckVoid(Game game, int[,] gameField, bool[,] isActivated, int i, int j, bool[,] bombDetected)
+        {//TODO zeilen obendrueber
+            for (int k = -1; k < 2; k++)
+            {
+                for (int l = -1; l < 2; l++)
+                {
+                    if (i + k < 0 || j + l < 0 ||
+                    i + k >= gameField.GetLength(0) || j + l >= gameField.GetLength(1) ||
+                    i + k == i && j + l == j) ;
+                    else if (gameField[i + k, j + l] == 0 && isActivated[i + k, j + l] == false)
+                    {
+                        isActivated[i + k, j + l] = true;
+                        CheckVoid(game, gameField, isActivated, i + k, j + l, bombDetected);
+                    }
+                    else
+                    {
+                        isActivated[i + k, j + l] = true;
+                    }
+                }
+            }
+        }
+
+
+
+        public static void DrawBaseField(Game game, int[,] gameField, bool[,] isActivated, bool[,] bombDetected)
         {
-            //Spielfeld malen, weiteres bool array nach jeder Navigation neu erstellen
+            bool loose = false;
+            int counter = 0;
+
+
+            //Spielfeld malen, weiteres bool array nach jeder Navigation neu erstellen(alternative)
             Console.SetCursorPosition(0, 0);
             for (int i = 0; i < game.SizeWidth + 2; i++)
             {
@@ -124,20 +157,68 @@ namespace MineSweeper
                 Console.Write("|");
                 for (int j = 0; j < game.sizeWidth; j++)
                 {
-                    if (gameField[i, j] == 10)
+                    if (gameField[i, j] == 10 && isActivated[i, j] && bombDetected[i, j] == false)
                     {
                         Console.SetCursorPosition(j + 1, i + 1);
                         Console.Write("#");
+
+                        loose = true;
+                        //EndScreen
                     }
-                    else if (gameField[i, j] > 0 && gameField[i, j] < 9)
+                    else if (gameField[i, j] == 10 && isActivated[i, j] || bombDetected[i, j])
                     {
                         Console.SetCursorPosition(j + 1, i + 1);
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.Write("B");
+                        Console.ResetColor();
+                    }
+                    else if (gameField[i, j] > 0 && gameField[i, j] < 9 && isActivated[i, j])
+                    {
+                        Console.SetCursorPosition(j + 1, i + 1);
+                        switch (gameField[i, j])
+                        {
+                            case 1:
+                                Console.ForegroundColor = ConsoleColor.Blue;
+                                break;
+                            case 2:
+                                Console.ForegroundColor = ConsoleColor.Green;
+                                break;
+                            case 3:
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                                break;
+                            case 4:
+                                Console.ForegroundColor = ConsoleColor.DarkBlue;
+                                break;
+                            case 5:
+                                Console.ForegroundColor = ConsoleColor.DarkCyan;
+                                break;
+                            case 6:
+                                Console.ForegroundColor = ConsoleColor.Cyan;
+                                break;
+                            case 7:
+                                Console.ForegroundColor = ConsoleColor.White;
+                                break;
+                            case 8:
+                                Console.ForegroundColor = ConsoleColor.DarkGray;
+                                break;
+                        }
                         Console.Write(gameField[i, j]);
+                        Console.ResetColor();
+
+                    }
+                    else if (isActivated[i, j])
+                    {
+                        CheckVoid(game, gameField, isActivated, i, j, bombDetected);
+
+                        //DrawBaseField(game, gameField, isActivated, bombDetected);
+
+                        Console.SetCursorPosition(j + 1, i + 1);
+                        Console.Write("*");
+
                     }
                     else
                     {
-                        Console.SetCursorPosition(j + 1, i + 1);
-                        Console.Write("*");
+                        Console.Write(" ");
                     }
                 }
                 Console.WriteLine("|");
@@ -147,55 +228,91 @@ namespace MineSweeper
             {
                 Console.Write("-");
             }
+
+            for (int i = 0; i < isActivated.GetLength(0); i++)
+            {
+                for (int j = 0; j < isActivated.GetLength(1); j++)
+                {
+                    if (isActivated[i, j]) counter++;
+                }
+            }
+
+            if (loose)
+            {
+                Console.SetCursorPosition(0, game.SizeWidth + 3);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("You Loose");
+                Console.ResetColor();
+                Environment.Exit(0);
+            }
+            else if (isActivated.GetLength(0) * isActivated.GetLength(1) - game.MinesCount == counter)
+            {
+                Console.SetCursorPosition(0, game.SizeWidth + 3);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("You Win");
+                Console.ResetColor();
+                Environment.Exit(0);
+
+            }
+
             //Console.WriteLine();
 
             //Fenster auf letzte Position setzen
             //Console.SetCursorPosition(cursorLeft, cursorHeight);
+
+            Navigation(game, gameField, isActivated, bombDetected);
         }
 
         public static bool NavigationValidationHeight(Game game, int cursorHeight)
         {
-            if (cursorHeight > 0 && cursorHeight < 6) return true;
+            if (cursorHeight > 0 && cursorHeight < game.SizeHeight + 1) return true;
             return false;
         }
 
         public static bool NavigationValidationLeft(Game game, int cursorLeft)
         {
-            if (cursorLeft > 0 && cursorLeft < 6) return true;
+            if (cursorLeft > 0 && cursorLeft < game.SizeWidth + 1) return true;
             return false;
         }
 
 
-        public static void Navigation(Game game, int[,] gameField)
+        public static void Navigation(Game game, int[,] gameField, bool[,] isActivated, bool[,] bombDetected)
         {
+
             //Cursorsteuerung
-            int cursorHeight = 1;
-            int cursorLeft = 1;
+
             do
             {
-                Console.SetCursorPosition(cursorLeft, cursorHeight);
+                Console.SetCursorPosition(game.CursorLeft, game.CursorHeight);
                 switch (Console.ReadKey().Key)
                 {
                     //case ConsoleKey.W:
                     case ConsoleKey.UpArrow:
-                        if (NavigationValidationHeight(game, cursorHeight - 1)) cursorHeight--;
+                        if (NavigationValidationHeight(game, game.CursorHeight - 1)) game.CursorHeight--;
                         break;
                     //case ConsoleKey.A:
                     case ConsoleKey.LeftArrow:
-                        if (NavigationValidationLeft(game, cursorLeft - 1)) cursorLeft--;
+                        if (NavigationValidationLeft(game, game.CursorLeft - 1)) game.CursorLeft--;
                         break;
                     //case ConsoleKey.S:
                     case ConsoleKey.DownArrow:
-                        if (NavigationValidationHeight(game, cursorHeight + 1)) cursorHeight++;
+                        if (NavigationValidationHeight(game, game.CursorHeight + 1)) game.CursorHeight++;
                         break;
                     //case ConsoleKey.D:
                     case ConsoleKey.RightArrow:
-                        if (NavigationValidationLeft(game, cursorLeft + 1)) cursorLeft++;
+                        if (NavigationValidationLeft(game, game.CursorLeft + 1)) game.CursorLeft++;
+                        break;
+                    case ConsoleKey.B:
+                        if (bombDetected[game.CursorHeight - 1, game.CursorLeft - 1])
+                            bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = false;
+                        else bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = true;
+                        DrawBaseField(game, gameField, isActivated, bombDetected);
                         break;
                     case ConsoleKey.Enter:
-                        //DrawField()
-                        Console.SetCursorPosition(Console.GetCursorPosition().Left, Console.GetCursorPosition().Top);
-                        Console.Write(gameField[Console.GetCursorPosition().Left, Console.GetCursorPosition().Top]);
+                        isActivated[game.CursorHeight - 1, game.CursorLeft - 1] = true;
+                        DrawBaseField(game, gameField, isActivated, bombDetected);
+                        //Doesn`t work, first char
+                        //Console.Write(gameField[Console.GetCursorPosition().Left, Console.GetCursorPosition().Top]);
                         break;
                     default:
                         break;
