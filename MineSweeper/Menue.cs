@@ -8,6 +8,11 @@ namespace MineSweeper
 {
     public static class Menue
     {
+        public static void MainMenueNew()
+        {
+
+        }
+
         public static void MainMenue()
         {
             //CursorGesteuertesMenue
@@ -24,9 +29,9 @@ namespace MineSweeper
                 switch (Console.ReadKey().Key)
                 {
                     case ConsoleKey.P: //TODO
-                        //Game game = new();
+                        Game game = new();
                         //Game.BuildField(game);
-                        //Game.GameLoop(game);
+                        Game.GameLoop(game);
                         break;
                     case ConsoleKey.H://TODO
                         break;
@@ -37,8 +42,8 @@ namespace MineSweeper
                         Console.WriteLine("Coming Soon");
                         break;
                     case ConsoleKey.E:
-                        Console.WriteLine("do you realy want to exit? (Y/N)");
-                        if (Console.ReadKey().Key == ConsoleKey.C) Environment.Exit(0);
+                        Console.WriteLine("\bDo you realy want to exit? (Y/N)");
+                        if (Console.ReadKey().Key == ConsoleKey.Y) Environment.Exit(0);
                         break;
                     default:
                         Console.WriteLine("not a valid Key");

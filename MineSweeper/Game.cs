@@ -10,8 +10,8 @@ namespace MineSweeper
     {
         int sizeHeight = 16;
         int sizeWidth = 16;
-        int minesCount = 40;
- 
+        int minesCount = 1;
+
         int cursorHeight = 1;
         int cursorLeft = 1;
 
@@ -260,64 +260,45 @@ namespace MineSweeper
             //Fenster auf letzte Position setzen
             //Console.SetCursorPosition(cursorLeft, cursorHeight);
 
-            Navigation(game, gameField, isActivated, bombDetected);
-        }
+            int[] actualNavigation = new int[3];
 
-        public static bool NavigationValidationHeight(Game game, int cursorHeight)
-        {
-            if (cursorHeight > 0 && cursorHeight < game.SizeHeight + 1) return true;
-            return false;
-        }
+            actualNavigation = NavigationNew.CursorNavigation(game.CursorHeight, game.CursorLeft, game.SizeHeight, game.SizeWidth);
 
-        public static bool NavigationValidationLeft(Game game, int cursorLeft)
-        {
-            if (cursorLeft > 0 && cursorLeft < game.SizeWidth + 1) return true;
-            return false;
-        }
+            game.CursorHeight = actualNavigation[0];
+            game.CursorLeft = actualNavigation[1];
 
-
-        public static void Navigation(Game game, int[,] gameField, bool[,] isActivated, bool[,] bombDetected)
-        {
-
-            //Cursorsteuerung
-
-            do
+            switch (actualNavigation[2])
             {
-                Console.SetCursorPosition(game.CursorLeft, game.CursorHeight);
-                switch (Console.ReadKey().Key)
-                {
-                    //case ConsoleKey.W:
-                    case ConsoleKey.UpArrow:
-                        if (NavigationValidationHeight(game, game.CursorHeight - 1)) game.CursorHeight--;
-                        break;
-                    //case ConsoleKey.A:
-                    case ConsoleKey.LeftArrow:
-                        if (NavigationValidationLeft(game, game.CursorLeft - 1)) game.CursorLeft--;
-                        break;
-                    //case ConsoleKey.S:
-                    case ConsoleKey.DownArrow:
-                        if (NavigationValidationHeight(game, game.CursorHeight + 1)) game.CursorHeight++;
-                        break;
-                    //case ConsoleKey.D:
-                    case ConsoleKey.RightArrow:
-                        if (NavigationValidationLeft(game, game.CursorLeft + 1)) game.CursorLeft++;
-                        break;
-                    case ConsoleKey.B:
-                        if (bombDetected[game.CursorHeight - 1, game.CursorLeft - 1])
-                            bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = false;
-                        else bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = true;
-                        DrawBaseField(game, gameField, isActivated, bombDetected);
-                        break;
-                    case ConsoleKey.Enter:
-                        isActivated[game.CursorHeight - 1, game.CursorLeft - 1] = true;
-                        DrawBaseField(game, gameField, isActivated, bombDetected);
-                        //Doesn`t work, first char
-                        //Console.Write(gameField[Console.GetCursorPosition().Left, Console.GetCursorPosition().Top]);
-                        break;
-                    default:
-                        break;
-                }
-            } while (true);
+                case 0:
+                    //BombDetection
+                    if (BombDetected(game.CursorHeight, game.CursorLeft, bombDetected/*, isActivated*/))
+                    {
+                        bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = true;
+                        isActivated[game.CursorHeight - 1, game.CursorLeft - 1] = false;
+                    }
+                    else bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = false;
+                    DrawBaseField(game, gameField, isActivated, bombDetected);
+                    break;
+                case 1:
+                    //Enter
+                    isActivated[game.CursorHeight - 1, game.CursorLeft - 1] = true;
+                    DrawBaseField(game, gameField, isActivated, bombDetected);
+                    break;
+                default:
+                    break;
+            }
         }
+
+        public static bool BombDetected(int actualHeight, int actualLeft, bool[,] bombDetected/*, bool[,] isActivated*/)
+        {
+            if (bombDetected[actualHeight - 1, actualLeft - 1])
+                return false;
+            else
+                return true;
+
+        }
+
+
+
     }
 }
