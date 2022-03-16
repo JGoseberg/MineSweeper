@@ -8,12 +8,19 @@ namespace MineSweeper
 {
     internal class Game
     {
-        int sizeHeight = 16;
-        int sizeWidth = 16;
-        int minesCount = 1;
+        int sizeHeight;
+        int sizeWidth;
+        int minesCount;
 
         int cursorHeight = 1;
         int cursorLeft = 1;
+
+        public Game(int sizeHeight, int sizeWidth, int minesCount)
+        {
+            SizeHeight = sizeHeight;
+            SizeWidth = sizeWidth;
+            MinesCount = minesCount;
+        }
 
         //Dictionary<int, string> colorHint = new Dictionary<int, string>()
         //{
@@ -243,25 +250,27 @@ namespace MineSweeper
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You Loose");
                 Console.ResetColor();
+                Console.WriteLine("\n\n\n\nDo you want to play again? (Y/N)");
+                if (Console.ReadKey().Key == ConsoleKey.Y) Menue.MainMenue(GetDiff(game.MinesCount));
                 Environment.Exit(0);
             }
             else if (isActivated.GetLength(0) * isActivated.GetLength(1) - game.MinesCount == counter)
             {
                 Console.SetCursorPosition(0, game.SizeWidth + 3);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("You Win");
+                Console.WriteLine("You Won");
                 Console.ResetColor();
+                Console.WriteLine("\n\n\n\nDo you want to play again? (Y/N)");
+                if (Console.ReadKey().Key == ConsoleKey.Y) Menue.MainMenue(GetDiff(game.MinesCount));
                 Environment.Exit(0);
 
             }
-
-            //Console.WriteLine();
-
-            //Fenster auf letzte Position setzen
-            //Console.SetCursorPosition(cursorLeft, cursorHeight);
+            Console.WriteLine("\n\n\n" +
+                "Navigate with the Arrows\n" +
+                "Press Enter to reveal the field\n" +
+                "Press B to place a Flag");
 
             int[] actualNavigation = new int[3];
-
             actualNavigation = NavigationNew.CursorNavigation(game.CursorHeight, game.CursorLeft, game.SizeHeight, game.SizeWidth);
 
             game.CursorHeight = actualNavigation[0];
@@ -271,7 +280,7 @@ namespace MineSweeper
             {
                 case 0:
                     //BombDetection
-                    if (BombDetected(game.CursorHeight, game.CursorLeft, bombDetected/*, isActivated*/))
+                    if (BombDetected(game.CursorHeight, game.CursorLeft, bombDetected))
                     {
                         bombDetected[game.CursorHeight - 1, game.CursorLeft - 1] = true;
                         isActivated[game.CursorHeight - 1, game.CursorLeft - 1] = false;
@@ -289,7 +298,26 @@ namespace MineSweeper
             }
         }
 
-        public static bool BombDetected(int actualHeight, int actualLeft, bool[,] bombDetected/*, bool[,] isActivated*/)
+        internal static int GetDiff(int mines)
+        {
+            switch (mines)
+            {
+                case 10:
+                    return 1;
+                    
+                case 40:
+                    return 2;
+                    
+                case 99:
+                    return 4;
+                default:
+                    return 1;
+
+            }
+        }
+
+
+        public static bool BombDetected(int actualHeight, int actualLeft, bool[,] bombDetected)
         {
             if (bombDetected[actualHeight - 1, actualLeft - 1])
                 return false;
