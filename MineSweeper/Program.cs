@@ -7,9 +7,5 @@
 
 using MineSweeper;
 
-//hop into a standard game
-//Game game = new();
-//Game.GameLoop(game);
-
-//TODO menueUeberspringen
+Console.WindowWidth = 40;
 Menue.MainMenue();

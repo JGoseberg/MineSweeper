@@ -32,21 +32,6 @@ namespace MineSweeper
         public int Width { get => width; set => width = value; }
         public int Mines { get => mines; set => mines = value; }
 
-        public Settings InitSettings(int difficultie)
-        {
-            if (File.Exists("settings.json"))
-            {
-                //LoadSettings()
-            }
-            else
-            {
-                Height = difficulties[difficultie, 0];
-                Width = difficulties[difficultie, 1];
-                Mines = difficulties[difficultie, 2];
-            }
-            return new Settings(Height, Width, Mines);
-        }
-
         public static void SaveSettings(Settings settings)
         {
             string save = JsonConvert.SerializeObject(settings);
@@ -58,7 +43,7 @@ namespace MineSweeper
         public static void SetSettings()
         {
             Console.Clear();
-            Console.WriteLine("Please Select\n(E)asy\n(M)edium/n(H)ard");
+            Console.WriteLine("Please Select\n(E)asy\n(M)edium\n(H)ard");
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.E:

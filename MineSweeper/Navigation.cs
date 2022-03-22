@@ -44,23 +44,15 @@ namespace MineSweeper
                     case ConsoleKey.RightArrow:
                         if (NavigationNew.NavigationValidationLeft(maxLeft, actualLeft + 1)) actualLeft++;
                         break;
-
-
                     case ConsoleKey.B:
                         // B = 0
                         return new int[] { actualHeight, actualLeft, 0 };
-
                     case ConsoleKey.Enter:
                         // Enter = 1
                         return new int[] { actualHeight, actualLeft, 1 };
-
-
-
                     default:
                         break;
-
                 }
-
             } while (true);
         }
     }

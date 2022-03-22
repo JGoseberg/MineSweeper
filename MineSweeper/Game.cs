@@ -22,18 +22,6 @@ namespace MineSweeper
             MinesCount = minesCount;
         }
 
-        //Dictionary<int, string> colorHint = new Dictionary<int, string>()
-        //{
-        //    { 1, "blue" },
-        //    { 2, "green" },
-        //    { 3, "red" },
-        //    { 4, "darkblue" },
-        //    { 5, "brown" },
-        //    { 6, "turquoise" },
-        //    { 7, "white" },
-        //    { 8, "dark grey" }
-        //};
-
 
         public int SizeHeight { get => sizeHeight; set => sizeHeight = value; }
         public int SizeWidth { get => sizeWidth; set => sizeWidth = value; }
@@ -246,11 +234,13 @@ namespace MineSweeper
 
             if (loose)
             {
-                Console.SetCursorPosition(0, game.SizeWidth + 3);
+                (int posL, int posT) = Console.GetCursorPosition();
+                Console.SetCursorPosition(0, game.SizeHeight + 2);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("You Loose");
                 Console.ResetColor();
-                Console.WriteLine("\n\n\n\nDo you want to play again? (Y/N)");
+                Console.WriteLine("Do you want to play again? (Y/N)");
+                Console.SetCursorPosition(game.CursorLeft, game.CursorHeight);
                 if (Console.ReadKey().Key == ConsoleKey.Y) Menue.MainMenue(GetDiff(game.MinesCount));
                 Environment.Exit(0);
             }
